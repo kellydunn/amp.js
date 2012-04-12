@@ -24,7 +24,9 @@ Chrome and Firefox only.
 
 # TODOs
 
-Use require.js to make this shit more modular.
+- Use require.js to make this shit more modular.
+- Refine customization parameters.
+- Create other Visualizations / anonymous callbacks for your own visualizations.
 
 # install
 
