@@ -9,14 +9,24 @@
 
 # what
 
-A javascript audio histogram for your phat beats or smoof jamz
+A javascript audio histogram for your phat beats or smoof jamz.
 
 # why
 
-I like watching bouncy basslines in my browser
+I like watching bouncy basslines in my browser.
+
+# TODOs
+
+Use require.js to make this shit more modular.
 
 # install
 
+Just include it in your <head> tag, son.
+
 # usage
 
-
+```
+Amp.Visualizer.color = 'red';
+Amp.Manager.url = "/your/mega/nasty/track.mp3"
+Amp.Manager.init_audio();
+```
