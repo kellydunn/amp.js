@@ -23,7 +23,7 @@ Use require.js to make this shit more modular.
 
 # install
 
-Just include it in your <head> tag, son.
+Just include it in your `<head>` tag, son.
 
 # usage
 
