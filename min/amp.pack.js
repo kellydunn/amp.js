@@ -6,7 +6,6 @@
   var $ = root.jQuery;
 
   var context;
-  var source = 0;
 
   // Histogram visualization based off of:
   // http://www.storiesinflight.com/jsfft/visualizer/index.html
@@ -29,9 +28,9 @@
       this.self.responseType = "arraybuffer";
 
       this.self.onload = (f != null) ? f : function() {
-        source.buffer = context.createBuffer(this.self.response, true);
-        source.loop = false;
-        source.noteOn(0);
+        Amp.Manager.source.buffer = context.createBuffer(this.self.response, true);
+        Amp.Manager.source.loop = false;
+        Amp.Manager.source.noteOn(0);
         Amp.Visualizer.animate();
       }.bind(this);
 
@@ -44,6 +43,7 @@
     range : 32,
     timeout : 10,
     jsProcessor : 0,
+    source : 0,
 
     init_page: function() {
       this.api = null;
@@ -69,7 +69,7 @@
     stop: function() {
       if(source != 0) {
         this.stopped = true;
-        source.noteOff(0);
+        this.source.noteOff(0);
       }
     },
 
@@ -87,12 +87,12 @@
         this.api = "webkit";
         context = new webkitAudioContext();
         context.sampleRate = 44100;
-        source = context.createBufferSource();
+        Amp.Manager.source = context.createBufferSource();
 
         this.jsProcessor = context.createJavaScriptNode(4096, 1, 2);
         this.jsProcessor.onaudioprocess = this.audioAvailable.bind(this);
 
-        source.connect(this.jsProcessor);
+        Amp.Manager.source.connect(this.jsProcessor);
         this.jsProcessor.connect(context.destination);
         this.loadSample(this.url);
       }
