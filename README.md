@@ -17,6 +17,11 @@ A javascript audio histogram for your phat beats or smoof jamz.
 
 I like watching bouncy basslines in my browser.
 
+# support
+
+HTML5 ain't easy.
+Chrome and Firefox only.
+
 # TODOs
 
 Use require.js to make this shit more modular.
