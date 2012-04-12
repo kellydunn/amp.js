@@ -67,7 +67,7 @@
     },
 
     stop: function() {
-      if(source != 0) {
+      if(this.source != 0) {
         this.stopped = true;
         this.source.noteOff(0);
       }
