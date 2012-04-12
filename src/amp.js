@@ -1,7 +1,7 @@
-(function(){
+(function () {
   // Shamelessly following Backbone's lead
   var root = this;
-  var Amp;
+  var Amp = null;
   Amp = (typeof exports !== 'undefined')? exports : root.Amp = {};
   var $ = root.jQuery;
 
