@@ -37,6 +37,9 @@ bundle install
 rake
 ```
 
+This will provide you with an `amp.pack.js` (a merged version of the project for debugging)
+and an `amp.min.js` (a production-ready version of the project)
+
 # usage
 
 Require `amp.pack.js` or `amp.min.js` in your page somewhere:
@@ -59,9 +62,6 @@ Amp.Manager.init_page();
 # demo
 
 `http://kelly-dunn.net/amp`
-
-This will provide you with an `amp.pack.js` (a merged version of the project for debugging)
-and an `amp.min.js` (a production-ready version of the project)
 
 # TODOs
 
