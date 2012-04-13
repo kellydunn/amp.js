@@ -52,7 +52,7 @@ Amp.Visualizer.color = 'red';
 Amp.Manager.mp3 = "/your/mega/nasty/track.mp3"
 // Remeber that Firefox doesn't use mp3s, you'll have to go with ogg for now :\
 Amp.Manager.ogg = "/your/mega/nasty/track.ogg"
-Amp.Manager.init_audio();
+Amp.Manager.init_page();
 ```
 
 This will provide you with an `amp.pack.js` (a merged version of the project for debugging)
@@ -61,4 +61,4 @@ and an `amp.min.js` (a production-ready version of the project)
 # TODOs
 
 - Make webkit / mozilla differentiation a bit more modular
-- Create other default Visualizations / anonymous callbacks for your own visualizations.
+- Create custom Visualizations.
