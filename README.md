@@ -49,6 +49,7 @@ then get crackin at specifiying your histogram:
 
 ```
 Amp.Visualizer.color = 'red';
+Amp.Visualizer.canvas = document.getElementById('fft'); // Or your own canvas element.
 Amp.Manager.mp3 = "/your/mega/nasty/track.mp3"
 // Remeber that Firefox doesn't use mp3s, you'll have to go with ogg for now :\
 Amp.Manager.ogg = "/your/mega/nasty/track.ogg"
@@ -60,5 +61,6 @@ and an `amp.min.js` (a production-ready version of the project)
 
 # TODOs
 
+- Perfect demo!
 - Make webkit / mozilla differentiation a bit more modular
 - Create custom Visualizations.
