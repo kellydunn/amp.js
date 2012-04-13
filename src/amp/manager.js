@@ -5,16 +5,16 @@ define("Amp.Manager", ["Amp"], function(){
     timeout : 10,
     jsProcessor : 0,
     source : 0,
-    bufferSize : 2048;
+    bufferSize : 2048,
 
     init_page: function() {
       this.api = null;
       this.context = null;
       this.currentvalue = new Array();
+      this.signal = new Float32Array(this.bufferSize);
       this.initAudio();
-      this.signal = new Float32Array(bufferSize);
       if(this.api != null && this.api == "webkit") {
-        this.fft = new FFT(bufferSize, 44100);
+        this.fft = new FFT(this.bufferSize, 44100);
       }
     },
 
@@ -88,9 +88,9 @@ define("Amp.Manager", ["Amp"], function(){
         }
       }
 
-      Amp.Manager.fft.forward(signal);
+      Amp.Manager.fft.forward(Amp.Manager.signal);
 
-      for ( var i = 0; i < bufferSize/Amp.Manager.range; i++ ) {
+      for ( var i = 0; i < Amp.Manager.bufferSize/Amp.Manager.range; i++ ) {
         Amp.Manager.currentvalue[i] = (Amp.Manager.fft.spectrum[i] * Amp.Manager.ZOOM);
       }
     }

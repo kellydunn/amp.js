@@ -1,5 +1,4 @@
 (function (global) {
-  // Shamelessly following Backbone's lead
   var root = this;
   var Amp = null;
   Amp = (typeof exports !== 'undefined')? exports : root.Amp = {};
@@ -7,10 +6,6 @@
 
   // Histogram visualization based off of:
   // http://www.storiesinflight.com/jsfft/visualizer/index.html
-
-  var bufferSize = 2048;
-  var signal = new Float32Array(bufferSize);
-
   var modules = {};
 
   Amp.define = function(module, dependencies, fn) {
@@ -38,14 +33,16 @@ define("Amp.Manager", ["Amp"], function(){
     timeout : 10,
     jsProcessor : 0,
     source : 0,
+    bufferSize : 2048,
 
     init_page: function() {
       this.api = null;
       this.context = null;
       this.currentvalue = new Array();
+      this.signal = new Float32Array(this.bufferSize);
       this.initAudio();
       if(this.api != null && this.api == "webkit") {
-        this.fft = new FFT(bufferSize, 44100);
+        this.fft = new FFT(this.bufferSize, 44100);
       }
     },
 
@@ -70,8 +67,7 @@ define("Amp.Manager", ["Amp"], function(){
     },
 
     initAudio: function() {
-      // TODO Debug for firefox
-      if(typeof webkitAudioContext == "undefined") {
+       if(typeof webkitAudioContext == "undefined") {
         this.api = "mozilla";
         Amp.Manager.context = new Audio();
         Amp.Manager.context.src = "/images/milkshake.ogg";
@@ -107,7 +103,7 @@ define("Amp.Manager", ["Amp"], function(){
         for (var i = 0; i < n; i++) {
           outputArrayL[i] = inputArrayL[i];
           outputArrayR[i] = inputArrayR[i];
-          signal[i] = (inputArrayL[i] + inputArrayR[i]) / 2;
+          this.signal[i] = (inputArrayL[i] + inputArrayR[i]) / 2;
         }
       } else if (Amp.Manager.api != null && Amp.Manager.api == "mozilla") {
         var framebuffer = event.frameBuffer;
@@ -116,13 +112,13 @@ define("Amp.Manager", ["Amp"], function(){
         var framebufferlength = Amp.Manager.context.mozFrameBufferLength;
 
         for(var i = 0, fbl = framebufferlength/2; i < fbl; i++) {
-          signal[i] = (framebuffer[2*i] + framebuffer[2*i+1]) / 2;
+          Amp.Manager.signal[i] = (framebuffer[2*i] + framebuffer[2*i+1]) / 2;
         }
       }
 
-      Amp.Manager.fft.forward(signal);
+      Amp.Manager.fft.forward(Amp.Manager.signal);
 
-      for ( var i = 0; i < bufferSize/Amp.Manager.range; i++ ) {
+      for ( var i = 0; i < Amp.Manager.bufferSize/Amp.Manager.range; i++ ) {
         Amp.Manager.currentvalue[i] = (Amp.Manager.fft.spectrum[i] * Amp.Manager.ZOOM);
       }
     }
