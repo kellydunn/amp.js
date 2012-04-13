@@ -7,7 +7,6 @@
 
   // Histogram visualization based off of:
   // http://www.storiesinflight.com/jsfft/visualizer/index.html
-  var currentvalue = new Array();
 
   var bufferSize = 2048;
   var signal = new Float32Array(bufferSize);
@@ -41,6 +40,7 @@
     init_page: function() {
       this.api = null;
       this.context = null;
+      this.currentvalue = new Array();
       this.initAudio();
       if(this.api != null && this.api == "webkit") {
         this.fft = new FFT(bufferSize, 44100);
@@ -121,31 +121,9 @@
       Amp.Manager.fft.forward(signal);
 
       for ( var i = 0; i < bufferSize/Amp.Manager.range; i++ ) {
-        currentvalue[i] = (Amp.Manager.fft.spectrum[i] * Amp.Manager.ZOOM);
+        Amp.Manager.currentvalue[i] = (Amp.Manager.fft.spectrum[i] * Amp.Manager.ZOOM);
       }
     }
   };
 
-  Amp.Visualizer = {
-    canvas : document.getElementById('fft'),
-    color : '#EEEEEE',
-    bar_width : 50,
-    bar_gap : 50,
-
-    animate: function() {
-      this.bar_height = this.canvas.height;
-      this.ctx = this.canvas.getContext('2d');
-      this.ctx.clearRect(0,0, this.canvas.width, this.canvas.height);
-      this.ctx.fillStyle = this.color;
-      for (var i=0; i<currentvalue.length; i++) {
-        this.ctx.fillRect(i * this.bar_gap, this.bar_height, this.bar_width, -currentvalue[i]*3);
-      }
-
-      t = setTimeout('Amp.Visualizer.animate()', Amp.Manager.timeout);
-      if(this.stopped) {
-        this.ctx.clearRect(0,0, this.canvas.width, this.canvas.height);
-        clearTimeout(t);
-      }
-    }
-  };
 })(typeof window === 'undefined' ? this : window);
