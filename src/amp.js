@@ -11,7 +11,6 @@
 
   var bufferSize = 2048;
   var signal = new Float32Array(bufferSize);
-  var peak = new Float32Array(bufferSize);
 
   var modules = {};
 
