@@ -17,10 +17,25 @@ A javascript audio histogram for your phat beats or smoof jamz.
 
 I like watching bouncy basslines in my browser.
 
+Inspired by `http://www.storiesinflight.com/jsfft/visualizer/index.html`
+
 # support
 
 HTML5 ain't easy.
 Chrome and Firefox only.
+
+# download
+
+For the time being, it's best to clone the repository and either build the latest `amp.min.js`, or just copy the current minified version in the `min` folder
+
+# build
+
+The build process makes use of some handy ruby gems, specifically `juicer`
+
+```
+bundle install
+rake
+```
 
 # usage
 
@@ -38,23 +53,10 @@ Amp.Manager.url = "/your/mega/nasty/track.mp3"
 Amp.Manager.init_audio();
 ```
 
-# build
-
-If you want to debug or otherwise contribute to the project, you can build (merge / minify) amp.js with a few ruby helpers:
-
-```
-bundle install
-rake
-```
-
-This will provide you with a amp.pack.js (a merged version of the project for debugging)
-and amp.min.js (a production-ready version of the project)
+This will provide you with an `amp.pack.js` (a merged version of the project for debugging)
+and an `amp.min.js` (a production-ready version of the project)
 
 # TODOs
 
-- Refine customization parameters.
-- Create other Visualizations / anonymous callbacks for your own visualizations.
-
-# install
-
-Just include it in your `<head>` tag, son.
+- Make webkit / mozilla differentiation a bit more modular
+- Create other default Visualizations / anonymous callbacks for your own visualizations.
