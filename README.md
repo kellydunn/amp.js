@@ -49,7 +49,9 @@ then get crackin at specifiying your histogram:
 
 ```
 Amp.Visualizer.color = 'red';
-Amp.Manager.url = "/your/mega/nasty/track.mp3"
+Amp.Manager.mp3 = "/your/mega/nasty/track.mp3"
+// Remeber that Firefox doesn't use mp3s, you'll have to go with ogg for now :\
+Amp.Manager.ogg = "/your/mega/nasty/track.ogg"
 Amp.Manager.init_audio();
 ```
 
