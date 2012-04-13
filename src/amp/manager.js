@@ -38,11 +38,12 @@ define("Amp.Manager", ["Amp"], function(){
       }
     },
 
+    // TODO Make seperate classes for seperate Browser APIs
     initAudio: function() {
        if(typeof webkitAudioContext == "undefined") {
         this.api = "mozilla";
         Amp.Manager.context = new Audio();
-        Amp.Manager.context.src = "/images/milkshake.ogg";
+        Amp.Manager.context.src = this.ogg;
         Amp.Manager.context.addEventListener('MozAudioAvailable', this.audioAvailable, false);
         Amp.Manager.context.addEventListener('loadedmetadata', this.init_moz_page, false);
         Amp.Manager.context.play();
@@ -58,11 +59,11 @@ define("Amp.Manager", ["Amp"], function(){
 
         Amp.Manager.source.connect(this.jsProcessor);
         this.jsProcessor.connect(this.context.destination);
-        this.loadSample(this.url);
+        this.loadSample(this.mp3);
       }
     },
 
-    // TODO Make seperate classes for seperate APIs
+    // TODO Make seperate classes for seperate Browser APIs
     audioAvailable : function(event) {
       if(this.api != null && this.api == "webkit") {
         var inputArrayL = event.inputBuffer.getChannelData(0);

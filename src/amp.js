@@ -3,9 +3,6 @@
   var Amp = null;
   Amp = (typeof exports !== 'undefined')? exports : root.Amp = {};
   var $ = root.jQuery;
-
-  // Histogram visualization based off of:
-  // http://www.storiesinflight.com/jsfft/visualizer/index.html
   var modules = {};
 
   Amp.define = function(module, dependencies, fn) {
