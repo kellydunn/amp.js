@@ -29,6 +29,7 @@ define("Amp.Manager", ["Amp"], function(){
     range : 32,
     timeout : 10,
     jsProcessor : 0,
+    jsProcessorSize: 4096,
     source : 0,
     bufferSize : 2048,
 
@@ -79,7 +80,7 @@ define("Amp.Manager", ["Amp"], function(){
         this.context.sampleRate = 44100;
         Amp.Manager.source = this.context.createBufferSource();
 
-        this.jsProcessor = this.context.createJavaScriptNode(4096, 1, 2);
+        this.jsProcessor = this.context.createJavaScriptNode(this.jsProcessorSize, 1, 2);
         this.jsProcessor.onaudioprocess = this.audioAvailable.bind(this);
 
         Amp.Manager.source.connect(this.jsProcessor);
