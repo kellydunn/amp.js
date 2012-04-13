@@ -50,10 +50,10 @@
 
     // Mozilla API needs to wait for a different callback to properly set up FFT
     init_moz_page: function() {
-      var framebufferlength = this.context.mozFrameBufferLength;
-      var channels = this.context.mozChannels;
-      var samplerate = this.context.mozSampleRate;
-      this.fft = new FFT(framebufferlength, samplerate);
+      var framebufferlength = Amp.Manager.context.mozFrameBufferLength;
+      var channels = Amp.Manager.context.mozChannels;
+      var samplerate = Amp.Manager.context.mozSampleRate;
+      Amp.Manager.fft = new FFT(framebufferlength, samplerate);
     },
 
     loadSample: function(url) {
@@ -72,11 +72,11 @@
       // TODO Debug for firefox
       if(typeof webkitAudioContext == "undefined") {
         this.api = "mozilla";
-        this.context = new Audio();
-        this.context.src = "/images/milkshake.ogg";
-        this.context.addEventListener('MozAudioAvailable', this.audioAvailable, false);
-        this.context.addEventListener('loadedmetadata', this.init_moz_page, false);
-        this.context.play();
+        Amp.Manager.context = new Audio();
+        Amp.Manager.context.src = "/images/milkshake.ogg";
+        Amp.Manager.context.addEventListener('MozAudioAvailable', this.audioAvailable, false);
+        Amp.Manager.context.addEventListener('loadedmetadata', this.init_moz_page, false);
+        Amp.Manager.context.play();
         Amp.Visualizer.animate();
       } else {
         this.api = "webkit";
@@ -112,17 +112,17 @@
         var framebuffer = event.frameBuffer;
         var time = event.time;
         var magnitude = null;
-        var framebufferlength = this.context.mozFrameBufferLength;
+        var framebufferlength = Amp.Manager.context.mozFrameBufferLength;
 
         for(var i = 0, fbl = framebufferlength/2; i < fbl; i++) {
           signal[i] = (framebuffer[2*i] + framebuffer[2*i+1]) / 2;
         }
       }
 
-      this.fft.forward(signal);
+      Amp.Manager.fft.forward(signal);
 
       for ( var i = 0; i < bufferSize/Amp.Manager.range; i++ ) {
-        currentvalue[i] = (this.fft.spectrum[i] * Amp.Manager.ZOOM);
+        currentvalue[i] = (Amp.Manager.fft.spectrum[i] * Amp.Manager.ZOOM);
       }
     }
   };
