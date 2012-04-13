@@ -1,11 +1,9 @@
-(function () {
+(function (global) {
   // Shamelessly following Backbone's lead
   var root = this;
   var Amp = null;
   Amp = (typeof exports !== 'undefined')? exports : root.Amp = {};
   var $ = root.jQuery;
-
-  var context;
 
   // Histogram visualization based off of:
   // http://www.storiesinflight.com/jsfft/visualizer/index.html
@@ -15,28 +13,24 @@
   var signal = new Float32Array(bufferSize);
   var peak = new Float32Array(bufferSize);
 
-  Amp.Request = {
-    type: "GET",
-    initialize: function(options, f) {
-      if(options == null) {
-        options = [];
-        options["url"] = "";
+  var modules = {};
+
+  Amp.define = function(module, dependencies, fn) {
+    if (typeof define === 'function' && define.amd) {
+      define(module, dependencies, fn);
+    } else {
+      if (dependencies && dependencies.length) {
+        for (var i = 0; i < dependencies.length; i++) {
+          dependencies[i] = modules[dependencies[i]];
+        }
       }
-
-      this.self = new XMLHttpRequest();
-      this.self.open(this.type, options["url"], true);
-      this.self.responseType = "arraybuffer";
-
-      this.self.onload = (f != null) ? f : function() {
-        Amp.Manager.source.buffer = context.createBuffer(this.self.response, true);
-        Amp.Manager.source.loop = false;
-        Amp.Manager.source.noteOn(0);
-        Amp.Visualizer.animate();
-      }.bind(this);
-
-      return this.self;
+      modules[module] = fn.apply(this, dependencies || []);
     }
   };
+
+  if (typeof define === 'undefined') {
+    global.define = Amp.define;
+  }
 
   Amp.Manager = {
     ZOOM : 100,
@@ -47,6 +41,7 @@
 
     init_page: function() {
       this.api = null;
+      this.context = null;
       this.initAudio();
       if(this.api != null && this.api == "webkit") {
         this.fft = new FFT(bufferSize, 44100);
@@ -55,9 +50,9 @@
 
     // Mozilla API needs to wait for a different callback to properly set up FFT
     init_moz_page: function() {
-      var framebufferlength = context.mozFrameBufferLength;
-      var channels = context.mozChannels;
-      var samplerate = context.mozSampleRate;
+      var framebufferlength = this.context.mozFrameBufferLength;
+      var channels = this.context.mozChannels;
+      var samplerate = this.context.mozSampleRate;
       this.fft = new FFT(framebufferlength, samplerate);
     },
 
@@ -77,23 +72,23 @@
       // TODO Debug for firefox
       if(typeof webkitAudioContext == "undefined") {
         this.api = "mozilla";
-        context = new Audio();
-        context.src = "/images/milkshake.ogg";
-        context.addEventListener('MozAudioAvailable', this.audioAvailable, false);
-        context.addEventListener('loadedmetadata', this.init_moz_page, false);
-        context.play();
+        this.context = new Audio();
+        this.context.src = "/images/milkshake.ogg";
+        this.context.addEventListener('MozAudioAvailable', this.audioAvailable, false);
+        this.context.addEventListener('loadedmetadata', this.init_moz_page, false);
+        this.context.play();
         Amp.Visualizer.animate();
       } else {
         this.api = "webkit";
-        context = new webkitAudioContext();
-        context.sampleRate = 44100;
-        Amp.Manager.source = context.createBufferSource();
+        this.context = new webkitAudioContext();
+        this.context.sampleRate = 44100;
+        Amp.Manager.source = this.context.createBufferSource();
 
-        this.jsProcessor = context.createJavaScriptNode(4096, 1, 2);
+        this.jsProcessor = this.context.createJavaScriptNode(4096, 1, 2);
         this.jsProcessor.onaudioprocess = this.audioAvailable.bind(this);
 
         Amp.Manager.source.connect(this.jsProcessor);
-        this.jsProcessor.connect(context.destination);
+        this.jsProcessor.connect(this.context.destination);
         this.loadSample(this.url);
       }
     },
@@ -117,7 +112,7 @@
         var framebuffer = event.frameBuffer;
         var time = event.time;
         var magnitude = null;
-        var framebufferlength = context.mozFrameBufferLength;
+        var framebufferlength = this.context.mozFrameBufferLength;
 
         for(var i = 0, fbl = framebufferlength/2; i < fbl; i++) {
           signal[i] = (framebuffer[2*i] + framebuffer[2*i+1]) / 2;
@@ -154,4 +149,4 @@
       }
     }
   };
-}).call(this);
+})(typeof window === 'undefined' ? this : window);
