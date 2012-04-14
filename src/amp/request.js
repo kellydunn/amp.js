@@ -12,7 +12,7 @@ define("Amp.Request", ["Amp"], function(){
       this.self.responseType = "arraybuffer";
 
       this.self.onload = (f != null) ? f : function() {
-        Amp.Manager.source.buffer = Amp.Manager.context.createBuffer(this.self.response, true);
+        Amp.Manager.source.buffer = Amp.Manager.api.context.createBuffer(this.self.response, true);
         Amp.Manager.source.loop = false;
         Amp.Manager.source.noteOn(0);
         Amp.Visualizer.animate();

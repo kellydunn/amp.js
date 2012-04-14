@@ -14,7 +14,7 @@ define("Amp.Manager", ["Amp"], function(){
       this.currentvalue = new Array();
       this.signal = new Float32Array(this.bufferSize);
       this.initAudio();
-      if(this.api != null && this.api == "webkit") {
+      if(this.api != null && this.api.name && this.api.name == "webkit") {
         this.fft = new FFT(this.bufferSize, 44100);
       }
     },
@@ -25,11 +25,6 @@ define("Amp.Manager", ["Amp"], function(){
       var channels = Amp.Manager.context.mozChannels;
       var samplerate = Amp.Manager.context.mozSampleRate;
       Amp.Manager.fft = new FFT(framebufferlength, samplerate);
-    },
-
-    loadSample: function(url) {
-      var request = Amp.Request.initialize({url: url});
-      request.send();
     },
 
     stop: function() {
@@ -50,23 +45,13 @@ define("Amp.Manager", ["Amp"], function(){
         Amp.Manager.context.play();
         Amp.Visualizer.animate();
       } else {
-        this.api = "webkit";
-        this.context = new webkitAudioContext();
-        this.context.sampleRate = 44100;
-        Amp.Manager.source = this.context.createBufferSource();
-
-        this.jsProcessor = this.context.createJavaScriptNode(this.jsProcessorSize, 1, 2);
-        this.jsProcessor.onaudioprocess = this.audioAvailable.bind(this);
-
-        Amp.Manager.source.connect(this.jsProcessor);
-        this.jsProcessor.connect(this.context.destination);
-        this.loadSample(this.mp3);
+        this.api = Amp.Apis.Webkit.initialize();
       }
     },
 
     // TODO Make seperate classes for seperate Browser APIs
     audioAvailable : function(event) {
-      if(this.api != null && this.api == "webkit") {
+      if(this.api != null && this.api.name && this.api.name == "webkit") {
         var inputArrayL = event.inputBuffer.getChannelData(0);
         var inputArrayR = event.inputBuffer.getChannelData(1);
         var outputArrayL = event.outputBuffer.getChannelData(0);
