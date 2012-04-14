@@ -63,8 +63,15 @@ Amp.Manager.init_page();
 
 `http://kelly-dunn.net/amp`
 
+You can change the visualization values of the histogram on the fly!  Open up a debugger and change some values, like:
+
+```
+Amp.Visualizer.color
+Amp.Visualizer.bar_height
+Amp.Visualizer.bar_width
+```
+
 # TODOs
 
 - Perfect demo!
-- Make webkit / mozilla differentiation a bit more modular
 - Create custom Visualizations.
