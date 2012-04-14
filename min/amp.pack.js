@@ -47,14 +47,6 @@ define("Amp.Manager", ["Amp"], function(){
       }
     },
 
-    // Mozilla API needs to wait for a different callback to properly set up FFT
-    init_moz_page: function() {
-      var framebufferlength = Amp.Manager.context.mozFrameBufferLength;
-      var channels = Amp.Manager.context.mozChannels;
-      var samplerate = Amp.Manager.context.mozSampleRate;
-      Amp.Manager.fft = new FFT(framebufferlength, samplerate);
-    },
-
     stop: function() {
       if(this.source != 0) {
         this.stopped = true;
@@ -62,49 +54,16 @@ define("Amp.Manager", ["Amp"], function(){
       }
     },
 
-    // TODO Make seperate classes for seperate Browser APIs
     initAudio: function() {
-       if(typeof webkitAudioContext == "undefined") {
-        this.api = "mozilla";
-        Amp.Manager.context = new Audio();
-        Amp.Manager.context.src = this.ogg;
-        Amp.Manager.context.addEventListener('MozAudioAvailable', this.audioAvailable, false);
-        Amp.Manager.context.addEventListener('loadedmetadata', this.init_moz_page, false);
-        Amp.Manager.context.play();
-        Amp.Visualizer.animate();
+      if(typeof webkitAudioContext == "undefined") {
+        this.api = Amp.Apis.Mozilla.initialize();
       } else {
         this.api = Amp.Apis.Webkit.initialize();
       }
     },
 
-    // TODO Make seperate classes for seperate Browser APIs
     audioAvailable : function(event) {
-      if(this.api != null && this.api.name && this.api.name == "webkit") {
-        var inputArrayL = event.inputBuffer.getChannelData(0);
-        var inputArrayR = event.inputBuffer.getChannelData(1);
-        var outputArrayL = event.outputBuffer.getChannelData(0);
-        var outputArrayR = event.outputBuffer.getChannelData(1);
-
-        var n = inputArrayL.length;
-
-        for (var i = 0; i < n; i++) {
-          outputArrayL[i] = inputArrayL[i];
-          outputArrayR[i] = inputArrayR[i];
-          this.signal[i] = (inputArrayL[i] + inputArrayR[i]) / 2;
-        }
-      } else if (Amp.Manager.api != null && Amp.Manager.api == "mozilla") {
-        var framebuffer = event.frameBuffer;
-        var time = event.time;
-        var magnitude = null;
-        var framebufferlength = Amp.Manager.context.mozFrameBufferLength;
-
-        for(var i = 0, fbl = framebufferlength/2; i < fbl; i++) {
-          Amp.Manager.signal[i] = (framebuffer[2*i] + framebuffer[2*i+1]) / 2;
-        }
-      }
-
       Amp.Manager.fft.forward(Amp.Manager.signal);
-
       for ( var i = 0; i < Amp.Manager.bufferSize/Amp.Manager.range; i++ ) {
         Amp.Manager.currentvalue[i] = (Amp.Manager.fft.spectrum[i] * Amp.Manager.ZOOM);
       }
@@ -159,6 +118,42 @@ define("Amp.Visualizer", ["Amp"], function(){
     }
   };
 });
+define("Amp.Apis.Mozilla", ["Amp", "Amp.Apis"], function(){
+  Amp.Apis.Mozilla = {
+    initialize : function (){
+      this.name = "mozilla";
+      this.context = new Audio();
+      this.context.src = Amp.Manager.ogg;
+      this.context.addEventListener('MozAudioAvailable', this.audioAvailable.bind(this), false);
+      this.context.addEventListener('loadedmetadata', this.loadedMetadata.bind(this), false);
+      this.context.play();
+      Amp.Visualizer.animate();
+      return this;
+    },
+
+    // TODO need to find out how to bind moz callbacks to use native "this"
+    audioAvailable: function(event) {
+      var framebuffer = event.frameBuffer;
+      var time = event.time;
+      var magnitude = null;
+      var framebufferlength = Amp.Manager.api.context.mozFrameBufferLength;
+
+      for(var i = 0, fbl = framebufferlength/2; i < fbl; i++) {
+        Amp.Manager.signal[i] = (framebuffer[2*i] + framebuffer[2*i+1]) / 2;
+      }
+
+      Amp.Manager.audioAvailable(event);
+    },
+
+    // TODO need to find out how to bind moz callbacks to use native "this"
+    loadedMetadata: function(event) {
+      var framebufferlength = Amp.Manager.api.context.mozFrameBufferLength;
+      var channels = Amp.Manager.api.context.mozChannels;
+      var samplerate = Amp.Manager.api.context.mozSampleRate;
+      Amp.Manager.fft = new FFT(framebufferlength, samplerate);
+    }
+  };
+});
 define("Amp.Apis.Webkit", ["Amp", "Amp.Apis"], function(){
   Amp.Apis.Webkit = {
     jsProcessor : 0,
@@ -172,13 +167,30 @@ define("Amp.Apis.Webkit", ["Amp", "Amp.Apis"], function(){
       Amp.Manager.source = this.context.createBufferSource();
 
       this.jsProcessor = this.context.createJavaScriptNode(this.jsProcessorSize, 1, 2);
-      this.jsProcessor.onaudioprocess = Amp.Manager.audioAvailable.bind(Amp.Manager);
+      this.jsProcessor.onaudioprocess = this.audioAvailable.bind(this);
 
       Amp.Manager.source.connect(this.jsProcessor);
       this.jsProcessor.connect(this.context.destination);
       this.loadSample(Amp.Manager.mp3);
 
       return this;
+    },
+
+    audioAvailable : function(event) {
+      var inputArrayL = event.inputBuffer.getChannelData(0);
+      var inputArrayR = event.inputBuffer.getChannelData(1);
+      var outputArrayL = event.outputBuffer.getChannelData(0);
+      var outputArrayR = event.outputBuffer.getChannelData(1);
+
+      var n = inputArrayL.length;
+
+      for (var i = 0; i < n; i++) {
+        outputArrayL[i] = inputArrayL[i];
+        outputArrayR[i] = inputArrayR[i];
+        Amp.Manager.signal[i] = (inputArrayL[i] + inputArrayR[i]) / 2;
+      }
+
+      Amp.Manager.audioAvailable(event);
     },
 
     loadSample: function(url) {

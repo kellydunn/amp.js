@@ -19,14 +19,6 @@ define("Amp.Manager", ["Amp"], function(){
       }
     },
 
-    // Mozilla API needs to wait for a different callback to properly set up FFT
-    init_moz_page: function() {
-      var framebufferlength = Amp.Manager.context.mozFrameBufferLength;
-      var channels = Amp.Manager.context.mozChannels;
-      var samplerate = Amp.Manager.context.mozSampleRate;
-      Amp.Manager.fft = new FFT(framebufferlength, samplerate);
-    },
-
     stop: function() {
       if(this.source != 0) {
         this.stopped = true;
@@ -34,49 +26,16 @@ define("Amp.Manager", ["Amp"], function(){
       }
     },
 
-    // TODO Make seperate classes for seperate Browser APIs
     initAudio: function() {
-       if(typeof webkitAudioContext == "undefined") {
-        this.api = "mozilla";
-        Amp.Manager.context = new Audio();
-        Amp.Manager.context.src = this.ogg;
-        Amp.Manager.context.addEventListener('MozAudioAvailable', this.audioAvailable, false);
-        Amp.Manager.context.addEventListener('loadedmetadata', this.init_moz_page, false);
-        Amp.Manager.context.play();
-        Amp.Visualizer.animate();
+      if(typeof webkitAudioContext == "undefined") {
+        this.api = Amp.Apis.Mozilla.initialize();
       } else {
         this.api = Amp.Apis.Webkit.initialize();
       }
     },
 
-    // TODO Make seperate classes for seperate Browser APIs
     audioAvailable : function(event) {
-      if(this.api != null && this.api.name && this.api.name == "webkit") {
-        var inputArrayL = event.inputBuffer.getChannelData(0);
-        var inputArrayR = event.inputBuffer.getChannelData(1);
-        var outputArrayL = event.outputBuffer.getChannelData(0);
-        var outputArrayR = event.outputBuffer.getChannelData(1);
-
-        var n = inputArrayL.length;
-
-        for (var i = 0; i < n; i++) {
-          outputArrayL[i] = inputArrayL[i];
-          outputArrayR[i] = inputArrayR[i];
-          this.signal[i] = (inputArrayL[i] + inputArrayR[i]) / 2;
-        }
-      } else if (Amp.Manager.api != null && Amp.Manager.api == "mozilla") {
-        var framebuffer = event.frameBuffer;
-        var time = event.time;
-        var magnitude = null;
-        var framebufferlength = Amp.Manager.context.mozFrameBufferLength;
-
-        for(var i = 0, fbl = framebufferlength/2; i < fbl; i++) {
-          Amp.Manager.signal[i] = (framebuffer[2*i] + framebuffer[2*i+1]) / 2;
-        }
-      }
-
       Amp.Manager.fft.forward(Amp.Manager.signal);
-
       for ( var i = 0; i < Amp.Manager.bufferSize/Amp.Manager.range; i++ ) {
         Amp.Manager.currentvalue[i] = (Amp.Manager.fft.spectrum[i] * Amp.Manager.ZOOM);
       }
