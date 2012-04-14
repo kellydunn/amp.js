@@ -23,6 +23,9 @@
   }
 
 })(typeof window === 'undefined' ? this : window);
+define("Amp.Apis", ["Amp"], function(){
+  Amp.Apis = {};
+});
 define("Amp.Manager", ["Amp"], function(){
   Amp.Manager = {
     ZOOM : 100,
@@ -169,5 +172,9 @@ define("Amp.Visualizer", ["Amp"], function(){
         clearTimeout(t);
       }
     }
+  };
+});
+define("Amp.Apis.Webkit", ["Amp", "Amp.Apis"], function(){
+  Amp.Apis.Webkit = {
   };
 });
