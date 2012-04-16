@@ -28,8 +28,8 @@ Chrome and Firefox only.
 
 This project currently depends on:
 
-dsp.js  `https://github.com/corbanbrook/dsp.js`
-fs.js   `https://github.com/podviaznikov/fs.js`
+- dsp.js  `https://github.com/corbanbrook/dsp.js`
+- fs.js   `https://github.com/podviaznikov/fs.js`
 
 # download
 
