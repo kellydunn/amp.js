@@ -24,6 +24,13 @@ Inspired by `http://www.storiesinflight.com/jsfft/visualizer/index.html`
 HTML5 ain't easy.
 Chrome and Firefox only.
 
+# dependencies
+
+This project currently depends on:
+
+dsp.js  `https://github.com/corbanbrook/dsp.js`
+fs.js   `https://github.com/podviaznikov/fs.js`
+
 # download
 
 For the time being, it's best to clone the repository and either build the latest `amp.min.js`, or just copy the current minified version in the `min` folder
